@@ -1,8 +1,14 @@
 package com.Booking.flows;
 
 import co.paralleluniverse.fibers.Suspendable;
+import com.Booking.states.BookingState;
+import net.corda.core.contracts.ContractState;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.transactions.SignedTransaction;
+import net.corda.core.utilities.ProgressTracker;
+
+import static net.corda.core.contracts.ContractsDSL.requireThat;
 
 // ******************
 // * Responder flow *
@@ -19,9 +25,30 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
     @Override
     public SignedTransaction call() throws FlowException {
         // Responder flow logic goes here.
-        System.out.println("Booking received from BookYourStay: " + counterpartySession.getCounterparty().getName().getOrganisation());
+        class SignTxFlow extends SignTransactionFlow {
+            private SignTxFlow(FlowSession otherPartyFlow, ProgressTracker progressTracker) {
+                super(otherPartyFlow, progressTracker);
+            }
 
-        return subFlow(new ReceiveFinalityFlow(counterpartySession));
+            @Override
+            protected void checkTransaction(SignedTransaction stx) {
+                requireThat(require -> {
+                    ContractState output = stx.getTx().getOutputs().get(0).getData();
+                    BookingState bookStateObj = (BookingState) output;
+                    require.using("This must be an Booking transaction.", output instanceof BookingState);
+                    String lastFourDigitCC = bookStateObj.getCreditCardNumber().substring(13,16);
+                    System.out.println("Reservation is confirmed : " + counterpartySession.getCounterparty().getName().getOrganisation());
+                    System.out.println("Credit Card Ends with "+ lastFourDigitCC + " is charged for Amaount: "+bookStateObj.getCreditCardAmount());
+                    return null;
+                });
+            }
+        }
+
+        final SignTxFlow signTxFlow = new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker());
+        final SecureHash txId = subFlow(signTxFlow).getId();
+
+        return subFlow(new ReceiveFinalityFlow(counterpartySession, txId));
+
 
     }
 }

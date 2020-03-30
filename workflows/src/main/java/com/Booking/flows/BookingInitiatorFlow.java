@@ -12,6 +12,7 @@ import net.corda.core.utilities.ProgressTracker;
 import static com.Booking.contracts.BookingContract.ID;
 
 
+import java.time.Instant;
 import java.util.Date;
 
 // ******************
@@ -22,19 +23,42 @@ import java.util.Date;
 public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
     private final String custName;
     private final int custAge;
-    private final Date checkInDate;
-    private final Date checkOutDate;
+    private final Instant  checkInDate;
+    private final Instant checkOutDate;
     private final String roomType;
     private final int roomRate;
-    private final long creditCardNumber;
-    private final Date creditCardExpDate;
+    private final String creditCardNumber;
+    private final Instant creditCardExpDate;
     private final double creditCardAmount;
     private final Party HotelHeaven;
 
+    private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Generating transaction based on new IOU.");
+    private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Verifying contract constraints.");
+    private final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step("Signing transaction with our private key.");
+    private final ProgressTracker.Step GATHERING_SIGS = new ProgressTracker.Step("Gathering the counterparty's signature.") {
+        @Override
+        public ProgressTracker childProgressTracker() {
+            return CollectSignaturesFlow.Companion.tracker();
+        }
+    };
+    private final ProgressTracker.Step FINALISING_TRANSACTION = new ProgressTracker.Step("Obtaining notary signature and recording transaction.") {
+        @Override
+        public ProgressTracker childProgressTracker() {
+            return FinalityFlow.Companion.tracker();
+        }
+    };
+    private final ProgressTracker progressTracker = new ProgressTracker(
+            GENERATING_TRANSACTION,
+            VERIFYING_TRANSACTION,
+            SIGNING_TRANSACTION,
+            GATHERING_SIGS,
+            FINALISING_TRANSACTION
+    );
 
-    private final ProgressTracker progressTracker = new ProgressTracker();
 
-    public BookingInitiatorFlow(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, long creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party hotelHeaven) {
+    //private final ProgressTracker progressTracker = new ProgressTracker();
+
+    public BookingInitiatorFlow(String custName, int custAge, Instant checkInDate, Instant checkOutDate, String roomType, int roomRate, String creditCardNumber, Instant creditCardExpDate, double creditCardAmount, Party hotelHeaven) {
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;
@@ -64,6 +88,9 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
         //        Get Notary identity from network map
 
         Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
+        // Stage 1.
+        progressTracker.setCurrentStep(GENERATING_TRANSACTION);
+        // Generate an unsigned transaction.
 
 //        Create the elements for a transaction (Input/ Output states)
 
@@ -74,16 +101,24 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
         TransactionBuilder txBuilder = new TransactionBuilder(notary)
                 .addOutputState(outputState,ID)
                 .addCommand(new BookingContract.Booking(),getOurIdentity().getOwningKey());
+        // Stage 2.
+        progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
+        // Verify that the transaction is valid.
+        txBuilder.verify(getServiceHub());
 
-        //        Sign the Transaction
-
+        // Stage 3.
+        progressTracker.setCurrentStep(SIGNING_TRANSACTION);
+        // Sign the transaction.
         SignedTransaction BookingReqTxn = getServiceHub().signInitialTransaction(txBuilder);
 
-//        Create a session with Bank
-
+        // Stage 4.
+        progressTracker.setCurrentStep(GATHERING_SIGS);
+        // Send the state to the counterparty, and receive it back with their signature.
         FlowSession bookingReqSession = initiateFlow(HotelHeaven);
-//        Finalize the transaction
 
+        // Stage 5.
+        progressTracker.setCurrentStep(FINALISING_TRANSACTION);
+        // Notarise and record the transaction in both parties' vaults.
         return subFlow(new FinalityFlow(BookingReqTxn, bookingReqSession));
     }
 }

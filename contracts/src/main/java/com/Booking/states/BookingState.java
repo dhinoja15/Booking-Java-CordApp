@@ -1,11 +1,13 @@
 package com.Booking.states;
 
 import com.Booking.contracts.BookingContract;
+//import io.netty.util.concurrent.AbstractFuture;
 import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -17,19 +19,21 @@ import java.util.List;
 public class BookingState implements ContractState {
     private final String custName;
     private final int custAge;
-    private final Date checkInDate;
-    private final Date checkOutDate;
+    @FutureOrPresent
+    private final Instant checkInDate;
+    @Future
+    private final Instant checkOutDate;
     private final String roomType;
     private final int roomRate;
-    private final long creditCardNumber;
-    private final Date creditCardExpDate;
+    private final String creditCardNumber;
+    private final Instant creditCardExpDate;
     private final double creditCardAmount;
     private final Party BookYourStay;
     private final Party HotelHeaven;
 
 
 
-    public BookingState(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, long creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party bookYourStay, Party hotelHeaven) {
+    public BookingState(String custName, int custAge, Instant checkInDate, Instant checkOutDate, String roomType, int roomRate, String creditCardNumber, Instant creditCardExpDate, double creditCardAmount, Party bookYourStay, Party hotelHeaven) {
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;
@@ -51,11 +55,11 @@ public class BookingState implements ContractState {
         return custAge;
     }
 
-    public Date getCheckInDate() {
+    public Instant getCheckInDate() {
         return checkInDate;
     }
 
-    public Date getCheckOutDate() {
+    public Instant getCheckOutDate() {
         return checkOutDate;
     }
 
@@ -67,11 +71,11 @@ public class BookingState implements ContractState {
         return roomRate;
     }
 
-    public long getCreditCardNumber() {
+    public String getCreditCardNumber() {
         return creditCardNumber;
     }
 
-    public Date getCreditCardExpDate() {
+    public Instant getCreditCardExpDate() {
         return creditCardExpDate;
     }
 
