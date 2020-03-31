@@ -55,7 +55,6 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
             FINALISING_TRANSACTION
     );
 
-
     //private final ProgressTracker progressTracker = new ProgressTracker();
 
     public BookingInitiatorFlow(String custName, int custAge, Instant checkInDate, Instant checkOutDate, String roomType, int roomRate, String creditCardNumber, Instant creditCardExpDate, double creditCardAmount, Party hotelHeaven) {

@@ -18,6 +18,7 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
     private FlowSession counterpartySession;
 
     public BookingResponderFlow(FlowSession counterpartySession) {
+
         this.counterpartySession = counterpartySession;
     }
 
@@ -36,9 +37,10 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
                     ContractState output = stx.getTx().getOutputs().get(0).getData();
                     BookingState bookStateObj = (BookingState) output;
                     require.using("This must be an Booking transaction.", output instanceof BookingState);
+                    require.using("Credit Card not Valid Ha Ha ", bookStateObj.getCreditCardNumber().length() == 16);
                     String lastFourDigitCC = bookStateObj.getCreditCardNumber().substring(13,16);
                     System.out.println("Reservation is confirmed : " + counterpartySession.getCounterparty().getName().getOrganisation());
-                    System.out.println("Credit Card Ends with "+ lastFourDigitCC + " is charged for Amaount: "+bookStateObj.getCreditCardAmount());
+                    System.out.println("Credit Card Ends with "+ lastFourDigitCC + " is charged for Amount: "+bookStateObj.getCreditCardAmount());
                     return null;
                 });
             }
