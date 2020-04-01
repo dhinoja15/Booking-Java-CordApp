@@ -17,10 +17,7 @@ import static net.corda.core.contracts.ContractsDSL.requireThat;
 public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
     private FlowSession counterpartySession;
 
-    public BookingResponderFlow(FlowSession counterpartySession) {
-
-        this.counterpartySession = counterpartySession;
-    }
+    public BookingResponderFlow(FlowSession counterpartySession) {this.counterpartySession = counterpartySession; }
 
     @Suspendable
     @Override
@@ -30,7 +27,6 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
             private SignTxFlow(FlowSession otherPartyFlow, ProgressTracker progressTracker) {
                 super(otherPartyFlow, progressTracker);
             }
-
             @Override
             protected void checkTransaction(SignedTransaction stx) {
                 requireThat(require -> {
@@ -46,11 +42,12 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
             }
         }
 
-        final SignTxFlow signTxFlow = new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker());
-        final SecureHash txId = subFlow(signTxFlow).getId();
+        //final SignTxFlow signTxFlow = new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker());
+        //final SecureHash txId = subFlow(signTxFlow).getId();
 
-        return subFlow(new ReceiveFinalityFlow(counterpartySession, txId));
+        System.out.println("Booking Request received from : " + counterpartySession.getCounterparty().getName().getOrganisation());
 
-
+        //return subFlow(new ReceiveFinalityFlow(counterpartySession));
+        return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
     }
 }

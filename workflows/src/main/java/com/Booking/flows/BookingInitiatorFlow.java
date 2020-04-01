@@ -3,17 +3,15 @@ package com.Booking.flows;
 import co.paralleluniverse.fibers.Suspendable;
 import com.Booking.contracts.BookingContract;
 import com.Booking.states.BookingState;
-import com.sun.xml.bind.v2.model.core.ID;
+//import com.sun.xml.bind.v2.model.core.ID;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-import static com.Booking.contracts.BookingContract.ID;
-
-
+import static com.Booking.contracts.BookingContract.BOOKING_CONTRACT_ID;
 import java.time.Instant;
-import java.util.Date;
+//import java.util.Date;
 
 // ******************
 // * Initiator flow *
@@ -67,7 +65,7 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
         this.creditCardNumber = creditCardNumber;
         this.creditCardExpDate = creditCardExpDate;
         this.creditCardAmount = creditCardAmount;
-        HotelHeaven = hotelHeaven;
+        this.HotelHeaven = hotelHeaven;
     }
 
     @Override
@@ -79,45 +77,46 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
     @Override
     public  SignedTransaction call() throws FlowException {
         // Initiator flow logic goes here.
-        if (getOurIdentity().getName().getOrganisation().equals("BookYourStay")) {
+          if (getOurIdentity().getName().getOrganisation().equals("BookYourStay")) {
             System.out.println("Identity Verified!");
-        } else {
+          } else {
             throw new FlowException("Booking Request not initiated by BookYourStay");
-        }
-        //        Get Notary identity from network map
+          }
+          // Get Notary identity from network map
 
-        Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
-        // Stage 1.
-        progressTracker.setCurrentStep(GENERATING_TRANSACTION);
-        // Generate an unsigned transaction.
+          Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
-//        Create the elements for a transaction (Input/ Output states)
+          // Create the elements for a transaction (Input/ Output states)
 
-         BookingState outputState = new BookingState(custName,custAge,checkInDate,checkOutDate,roomType,roomRate,creditCardNumber,creditCardExpDate,creditCardAmount, getOurIdentity(),HotelHeaven);
+          BookingState outputState = new BookingState(custName,custAge,checkInDate,checkOutDate,roomType,roomRate,
+                 creditCardNumber,creditCardExpDate,creditCardAmount, getOurIdentity(),HotelHeaven);
 
-//        Transactions in Corda are built using Transaction Builder and elements are added to it
+          // Transactions in Corda are built using Transaction Builder and elements are added to it
+          // Stage 1.
+          progressTracker.setCurrentStep(GENERATING_TRANSACTION);
+          // Generate an unsigned transaction.
 
-        TransactionBuilder txBuilder = new TransactionBuilder(notary)
-                .addOutputState(outputState,ID)
+          TransactionBuilder txBuilder = new TransactionBuilder(notary)
+                .addOutputState(outputState,BOOKING_CONTRACT_ID)
                 .addCommand(new BookingContract.Booking(),getOurIdentity().getOwningKey());
-        // Stage 2.
-        progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
-        // Verify that the transaction is valid.
-        txBuilder.verify(getServiceHub());
+          // Stage 2.
+          progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
+          // Verify that the transaction is valid.
+          //txBuilder.verify(getServiceHub());
 
-        // Stage 3.
-        progressTracker.setCurrentStep(SIGNING_TRANSACTION);
-        // Sign the transaction.
-        SignedTransaction BookingReqTxn = getServiceHub().signInitialTransaction(txBuilder);
+          // Stage 3.
+          progressTracker.setCurrentStep(SIGNING_TRANSACTION);
+          // Sign the transaction.
+          SignedTransaction BookingReqTxn = getServiceHub().signInitialTransaction(txBuilder);
 
-        // Stage 4.
-        progressTracker.setCurrentStep(GATHERING_SIGS);
-        // Send the state to the counterparty, and receive it back with their signature.
-        FlowSession bookingReqSession = initiateFlow(HotelHeaven);
+          // Stage 4.
+          progressTracker.setCurrentStep(GATHERING_SIGS);
+          // Send the state to the counterparty, and receive it back with their signature.
+          FlowSession bookingReqSession = initiateFlow(HotelHeaven);
 
-        // Stage 5.
-        progressTracker.setCurrentStep(FINALISING_TRANSACTION);
-        // Notarise and record the transaction in both parties' vaults.
-        return subFlow(new FinalityFlow(BookingReqTxn, bookingReqSession));
+          // Stage 5.
+          progressTracker.setCurrentStep(FINALISING_TRANSACTION);
+          // Notarise and record the transaction in both parties' vaults.
+          return subFlow(new FinalityFlow(BookingReqTxn, bookingReqSession));
     }
 }

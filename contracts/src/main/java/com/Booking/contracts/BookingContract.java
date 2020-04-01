@@ -22,7 +22,7 @@ import static net.corda.core.contracts.ContractsDSL.requireThat;
 // ************
 public class BookingContract implements Contract {
     // This is used to identify our contract when building a transaction.
-    public static final String ID = "com.Booking.contracts.BookingContract";
+    public static final String BOOKING_CONTRACT_ID = "com.Booking.contracts.BookingContract";
 
     // A transaction is valid if the verify() function of the contract of all the transaction's input and output states
     // does not throw an exception.
@@ -72,7 +72,9 @@ public class BookingContract implements Contract {
                 require.using( "Check out date should be after check in date", bookState.getCheckOutDate().isAfter(bookState.getCheckInDate()));
                 require.using("Check in date should be future date",bookState.getCheckInDate().isAfter(Instant.now()) );
                 require.using("Check out date should be future date",bookState.getCheckOutDate().isAfter(Instant.now()) );
-                require.using("Room Type Must from K || NK || DD || NDD",bookState.getRoomType().equals("N")||bookState.getRoomType().equals("NK") ||bookState.getRoomType().equals("DD")||bookState.getRoomType().equals("NDD"));
+                require.using("Room Type Must from K || NK || DD || NDD",
+                        bookState.getRoomType().equals("N")||bookState.getRoomType().equals("NK")
+                                ||bookState.getRoomType().equals("DD")||bookState.getRoomType().equals("NDD"));
                 require.using("5\tAfter commission price should 85% of Original room price.",bookState.getCreditCardAmount() == (bookState.getRoomRate())*0.85);
                 //require.using("Credit card number is invalid", bookState.getCreditCardNumber().length() == 16);
                 require.using("Credit card EXP Date is Invalid", bookState.getCreditCardExpDate().isAfter(Instant.now()));
@@ -93,9 +95,4 @@ public class BookingContract implements Contract {
     // Used to indicate the transaction's intent.
     public static class Booking implements CommandData {
     }
-    // Used to indicate the transaction's intent.
-        /*public interface Commands extends CommandData {
-            class Action implements Commands {
-            }
-        }*/
-    }
+}

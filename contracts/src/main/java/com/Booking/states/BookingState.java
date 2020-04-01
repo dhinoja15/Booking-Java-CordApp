@@ -6,10 +6,8 @@ import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
-
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 // *********
@@ -19,9 +17,7 @@ import java.util.List;
 public class BookingState implements ContractState {
     private final String custName;
     private final int custAge;
-    @FutureOrPresent
     private final Instant checkInDate;
-    @Future
     private final Instant checkOutDate;
     private final String roomType;
     private final int roomRate;
@@ -30,8 +26,6 @@ public class BookingState implements ContractState {
     private final double creditCardAmount;
     private final Party BookYourStay;
     private final Party HotelHeaven;
-
-
 
     public BookingState(String custName, int custAge, Instant checkInDate, Instant checkOutDate, String roomType, int roomRate, String creditCardNumber, Instant creditCardExpDate, double creditCardAmount, Party bookYourStay, Party hotelHeaven) {
         this.custName = custName;
