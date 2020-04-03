@@ -11,6 +11,7 @@ import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
 import static com.Booking.contracts.BookingContract.BOOKING_CONTRACT_ID;
 import java.time.Instant;
+import java.util.Date;
 //import java.util.Date;
 
 // ******************
@@ -21,19 +22,23 @@ import java.time.Instant;
 public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
     private final String custName;
     private final int custAge;
-    private final Instant  checkInDate;
-    private final Instant checkOutDate;
+    private final Date checkInDate;
+    private final Date checkOutDate;
     private final String roomType;
     private final int roomRate;
     private final String creditCardNumber;
-    private final Instant creditCardExpDate;
+    private final Date creditCardExpDate;
     private final double creditCardAmount;
     private final Party HotelHeaven;
+
 
     private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Generating transaction based on new IOU.");
     private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Verifying contract constraints.");
     private final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step("Signing transaction with our private key.");
     private final ProgressTracker.Step GATHERING_SIGS = new ProgressTracker.Step("Gathering the counterparty's signature.") {
+
+
+
         @Override
         public ProgressTracker childProgressTracker() {
             return CollectSignaturesFlow.Companion.tracker();
@@ -55,7 +60,7 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
 
     //private final ProgressTracker progressTracker = new ProgressTracker();
 
-    public BookingInitiatorFlow(String custName, int custAge, Instant checkInDate, Instant checkOutDate, String roomType, int roomRate, String creditCardNumber, Instant creditCardExpDate, double creditCardAmount, Party hotelHeaven) {
+    public BookingInitiatorFlow(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party hotelHeaven) {
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;
@@ -79,9 +84,9 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
         // Initiator flow logic goes here.
           if (getOurIdentity().getName().getOrganisation().equals("BookYourStay")) {
             System.out.println("Identity Verified!");
-          } else {
+          } /*else {
             throw new FlowException("Booking Request not initiated by BookYourStay");
-          }
+          }*/
           // Get Notary identity from network map
 
           Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
@@ -98,7 +103,7 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
 
           TransactionBuilder txBuilder = new TransactionBuilder(notary)
                 .addOutputState(outputState,BOOKING_CONTRACT_ID)
-                .addCommand(new BookingContract.Booking(),getOurIdentity().getOwningKey());
+                .addCommand(new BookingContract.Commands.Booking(),getOurIdentity().getOwningKey());
           // Stage 2.
           progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
           // Verify that the transaction is valid.

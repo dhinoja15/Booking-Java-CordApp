@@ -23,7 +23,7 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
     @Override
     public SignedTransaction call() throws FlowException {
         // Responder flow logic goes here.
-        class SignTxFlow extends SignTransactionFlow {
+       /* class SignTxFlow extends SignTransactionFlow {
             private SignTxFlow(FlowSession otherPartyFlow, ProgressTracker progressTracker) {
                 super(otherPartyFlow, progressTracker);
             }
@@ -41,13 +41,13 @@ public class BookingResponderFlow extends FlowLogic<SignedTransaction> {
                 });
             }
         }
-
+*/
         //final SignTxFlow signTxFlow = new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker());
         //final SecureHash txId = subFlow(signTxFlow).getId();
 
         System.out.println("Booking Request received from : " + counterpartySession.getCounterparty().getName().getOrganisation());
 
-        //return subFlow(new ReceiveFinalityFlow(counterpartySession));
-        return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+        return subFlow(new ReceiveFinalityFlow(counterpartySession));
+        //return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
     }
 }

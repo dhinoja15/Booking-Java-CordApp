@@ -8,6 +8,7 @@ import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 // *********
@@ -17,17 +18,17 @@ import java.util.List;
 public class BookingState implements ContractState {
     private final String custName;
     private final int custAge;
-    private final Instant checkInDate;
-    private final Instant checkOutDate;
+    private final Date checkInDate;
+    private final Date checkOutDate;
     private final String roomType;
     private final int roomRate;
     private final String creditCardNumber;
-    private final Instant creditCardExpDate;
+    private final Date creditCardExpDate;
     private final double creditCardAmount;
     private final Party BookYourStay;
     private final Party HotelHeaven;
 
-    public BookingState(String custName, int custAge, Instant checkInDate, Instant checkOutDate, String roomType, int roomRate, String creditCardNumber, Instant creditCardExpDate, double creditCardAmount, Party bookYourStay, Party hotelHeaven) {
+    public BookingState(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party bookYourStay, Party hotelHeaven) {
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;
@@ -49,11 +50,11 @@ public class BookingState implements ContractState {
         return custAge;
     }
 
-    public Instant getCheckInDate() {
+    public Date getCheckInDate() {
         return checkInDate;
     }
 
-    public Instant getCheckOutDate() {
+    public Date getCheckOutDate() {
         return checkOutDate;
     }
 
@@ -69,7 +70,7 @@ public class BookingState implements ContractState {
         return creditCardNumber;
     }
 
-    public Instant getCreditCardExpDate() {
+    public Date getCreditCardExpDate() {
         return creditCardExpDate;
     }
 
