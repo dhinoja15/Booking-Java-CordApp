@@ -1,28 +1,26 @@
-package com.Booking.states;
+package com.Booking.flows;
 
 import com.Booking.contracts.BookingContract;
-//import io.netty.util.concurrent.AbstractFuture;
 import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+import net.corda.core.serialization.CordaSerializable;
 import org.jetbrains.annotations.NotNull;
 
-import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+//import io.netty.util.concurrent.AbstractFuture;
+
 // *********
 // * State *
 // *********
-@BelongsToContract(BookingContract.class)
-@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="type",discriminatorType= DiscriminatorType.STRING)
-@DiscriminatorValue(value="BookingState")
-public class BookingState implements QueryableState {
+@CordaSerializable
+public class BookingInfo {
     private final String custName;
     private final int custAge;
     private final Date checkInDate;
@@ -32,11 +30,8 @@ public class BookingState implements QueryableState {
     private final String creditCardNumber;
     private final Date creditCardExpDate;
     private final double creditCardAmount;
-    private final Party BookYourStay;
-    private final Party HotelHeaven;
 
-
-    public BookingState(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party bookYourStay, Party hotelHeaven) {
+    public BookingInfo(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount) {
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;
@@ -46,25 +41,6 @@ public class BookingState implements QueryableState {
         this.creditCardNumber = creditCardNumber;
         this.creditCardExpDate = creditCardExpDate;
         this.creditCardAmount = creditCardAmount;
-        BookYourStay = bookYourStay;
-        HotelHeaven = hotelHeaven;
-    }
-
-    public BookingState() {
-        custAge = Integer.parseInt(null);
-        custName = null;
-        checkInDate = null;
-        checkOutDate = null;
-        roomType = null;
-        roomRate = Integer.parseInt(null);
-        creditCardNumber = null;
-        creditCardExpDate = null;
-        creditCardAmount = Double.parseDouble(null);
-
-        BookYourStay = null;
-        HotelHeaven = null;
-
-
     }
 
 
@@ -104,28 +80,5 @@ public class BookingState implements QueryableState {
         return creditCardAmount;
     }
 
-    public Party getBookYourStay() {
-        return BookYourStay;
-    }
 
-    public Party getHotelHeaven() {
-        return HotelHeaven;
-    }
-
-    @Override
-    public List<AbstractParty> getParticipants() {
-        return Arrays.asList(BookYourStay,HotelHeaven);
-    }
-
-    @NotNull
-    @Override
-    public PersistentState generateMappedObject(@NotNull MappedSchema schema) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public Iterable<MappedSchema> supportedSchemas() {
-        return null;
-    }
 }
