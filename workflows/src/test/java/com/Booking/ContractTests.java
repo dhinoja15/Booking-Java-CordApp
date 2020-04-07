@@ -3,8 +3,6 @@ package com.Booking;
 import com.Booking.contracts.BookingContract;
 import com.Booking.states.BookingState;
 import com.google.common.collect.ImmutableList;
-import net.corda.core.contracts.TransactionVerificationException;
-import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.testing.core.TestIdentity;
 import net.corda.testing.node.MockServices;
@@ -18,7 +16,6 @@ import java.util.Date;
 
 import static java.util.Arrays.asList;
 import static net.corda.testing.node.NodeTestUtils.ledger;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 public class ContractTests  {
     //private final MockServices ledgerServices = new MockServices();
@@ -44,7 +41,7 @@ public class ContractTests  {
 
         ledger(ledgerServices, (ledger -> {
             ledger.transaction(tx -> {
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
                 tx.fails();
@@ -69,10 +66,10 @@ public class ContractTests  {
 
         ledger(ledgerServices, (ledger -> {
             ledger.transaction(tx -> {
-                tx.input(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.input(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
                 tx.command(ImmutableList.of(BookMyStay.getPublicKey(), HotelHeaven.getPublicKey()), new BookingContract.Commands.Booking());
@@ -94,10 +91,10 @@ public class ContractTests  {
 
         ledger(ledgerServices, (ledger -> {
             ledger.transaction(tx -> {
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
                 tx.command(ImmutableList.of(BookMyStay.getPublicKey(), HotelHeaven.getPublicKey()), new BookingContract.Commands.Booking());
@@ -118,7 +115,7 @@ public class ContractTests  {
 
         ledger(ledgerServices, (ledger -> {
             ledger.transaction(tx -> {
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
                 tx.command(BookMyStay.getPublicKey(), new BookingContract.Commands.Booking());
@@ -139,7 +136,7 @@ public class ContractTests  {
 
         ledger(ledgerServices, (ledger -> {
             ledger.transaction(tx -> {
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), HotelHeaven.getParty()));
                 tx.command(HotelHeaven.getPublicKey(), new BookingContract.Commands.Booking());
@@ -161,7 +158,7 @@ public class ContractTests  {
 
         ledger(ledgerServices, (ledger -> {
             ledger.transaction(tx -> {
-                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState("Sonal", 27, checkInDate,
+                tx.output(BookingContract.BOOKING_CONTRACT_ID, new BookingState(id, "Sonal", 27, checkInDate,
                         checkOutDate, "NK", 100, "12345678901234",
                         creditCardExpDate , 85, BookMyStay.getParty(), BookMyStay.getParty()));
                 tx.command(ImmutableList.of(BookMyStay.getPublicKey(), HotelHeaven.getPublicKey()), new BookingContract.Commands.Booking());

@@ -10,7 +10,7 @@ import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
 import static com.Booking.contracts.BookingContract.BOOKING_CONTRACT_ID;
-import java.time.Instant;
+
 import java.util.Date;
 //import java.util.Date;
 
@@ -60,7 +60,7 @@ public class BookingInitiatorFlow extends FlowLogic<SignedTransaction> {
 
     //private final ProgressTracker progressTracker = new ProgressTracker();
 
-    public BookingInitiatorFlow(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party hotelHeaven) {
+    public BookingInitiatorFlow( String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount, Party hotelHeaven) {
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;

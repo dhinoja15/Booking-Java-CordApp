@@ -1,6 +1,8 @@
 package com.Booking.schemas;
 
 import com.Booking.states.BookingState;
+import net.corda.core.schemas.PersistentState;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -12,15 +14,16 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "BOOKING_DETAIL")
-@Access(value=AccessType.FIELD)
-@DiscriminatorValue("PersistentBookingClass")
-public class PersistentBookingClass extends BookingState implements Serializable {
-    @Access(value=AccessType.PROPERTY)
-    @Id
-    @GeneratedValue
+//@Access(value=AccessType.FIELD)
+//@DiscriminatorValue("PersistentBookingClass")
+public class PersistentBookingClass extends PersistentState implements Serializable {
+  //  @Access(value=AccessType.PROPERTY)
 
-    @Column(name = "custName", unique = true, nullable = false)
-    private static String custName;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
+    private final long  id;
+    @Column
+    private final String custName;
     @Column
     private final int custAge;
     @Column
@@ -39,7 +42,9 @@ public class PersistentBookingClass extends BookingState implements Serializable
     private final double creditCardAmount;
 
 
-    public PersistentBookingClass(String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount) {
+    public PersistentBookingClass(long id, String custName, int custAge, Date checkInDate, Date checkOutDate, String roomType, int roomRate, String creditCardNumber, Date creditCardExpDate, double creditCardAmount) {
+        //super(id);
+        this.id = id;
         this.custName = custName;
         this.custAge = custAge;
         this.checkInDate = checkInDate;
@@ -53,7 +58,9 @@ public class PersistentBookingClass extends BookingState implements Serializable
 
 
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    public long getId(){return id;}
     @Column(name = "custName")
     public String getCustName() {
         return custName;

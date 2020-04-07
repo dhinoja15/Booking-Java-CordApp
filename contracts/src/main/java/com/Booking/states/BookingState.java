@@ -1,16 +1,17 @@
 package com.Booking.states;
 
 import com.Booking.contracts.BookingContract;
-//import io.netty.util.concurrent.AbstractFuture;
+import com.Booking.schemas.BookingSchemaV1;
+import com.Booking.schemas.PersistentBookingClass;
+import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.BelongsToContract;
+import net.corda.core.contracts.ContractState;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
-
-import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -19,10 +20,8 @@ import java.util.List;
 // * State *
 // *********
 @BelongsToContract(BookingContract.class)
-@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="type",discriminatorType= DiscriminatorType.STRING)
-@DiscriminatorValue(value="BookingState")
-public class BookingState implements QueryableState {
+public class BookingState implements ContractState,QueryableState {
+
     private final String custName;
     private final int custAge;
     private final Date checkInDate;
@@ -48,23 +47,6 @@ public class BookingState implements QueryableState {
         this.creditCardAmount = creditCardAmount;
         BookYourStay = bookYourStay;
         HotelHeaven = hotelHeaven;
-    }
-
-    public BookingState() {
-        custAge = Integer.parseInt(null);
-        custName = null;
-        checkInDate = null;
-        checkOutDate = null;
-        roomType = null;
-        roomRate = Integer.parseInt(null);
-        creditCardNumber = null;
-        creditCardExpDate = null;
-        creditCardAmount = Double.parseDouble(null);
-
-        BookYourStay = null;
-        HotelHeaven = null;
-
-
     }
 
 
@@ -119,13 +101,35 @@ public class BookingState implements QueryableState {
 
     @NotNull
     @Override
-    public PersistentState generateMappedObject(@NotNull MappedSchema schema) {
-        return null;
-    }
+    public PersistentState generateMappedObject(@NotNull MappedSchema schemas) {
+        int id;
+        int numInstances=0;
 
+        if(schemas instanceof BookingSchemaV1) {
+
+            return new PersistentBookingClass(
+
+                    id = ++numInstances,
+                    this.custName,
+                    this.custAge,
+                    this.checkInDate,
+                    this.checkOutDate,
+                    this.roomType,
+                    this.roomRate,
+                    this.creditCardNumber,
+                    this.creditCardExpDate,
+                    this.creditCardAmount
+
+            );
+        }
+        else{
+            throw new IllegalArgumentException("Unsupported Schema");
+        }
+
+    }
     @NotNull
     @Override
     public Iterable<MappedSchema> supportedSchemas() {
-        return null;
+        return ImmutableList.of(new BookingSchemaV1());
     }
 }

@@ -11,7 +11,6 @@ import net.corda.core.contracts.TransactionState;
 import net.corda.core.contracts.TransactionVerificationException;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
-import net.corda.finance.Currencies;
 import net.corda.testing.node.MockNetwork;
 import net.corda.testing.node.MockNetworkParameters;
 import net.corda.testing.node.StartedMockNode;
@@ -24,13 +23,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import static javafx.scene.input.KeyCode.Z;
-import static org.assertj.core.util.DateUtil.now;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 
@@ -88,7 +84,7 @@ public class FlowTests {
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
         // All data correct
         Future<SignedTransaction> correctTx = bookYourStay.startFlow(new BookingInitiatorFlow
-                ("Sonal", 27, checkInDate, checkOutDate, "NK", 100,
+                (id, "Sonal", 27, checkInDate, checkOutDate, "NK", 100,
                         "12345678901234", creditCardExpDate , 85, HotelHeaven));
         network.runNetwork();
         correctTx.get();
@@ -96,7 +92,7 @@ public class FlowTests {
 
         //When Customer age is less than 18 year
         Future<SignedTransaction> ageLess = bookYourStay.startFlow(new BookingInitiatorFlow
-                ("Sonal", 17, checkInDate, checkOutDate, "NK", 100,
+                (id, "Sonal", 17, checkInDate, checkOutDate, "NK", 100,
                         "12345678901234", creditCardExpDate , 85, HotelHeaven));
         network.runNetwork();
         exception.expectCause(instanceOf(TransactionVerificationException.class));
@@ -108,7 +104,7 @@ public class FlowTests {
         String creditCardExpNew = "4/1/2020";
         Date creditCardExpDateNew=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
         Future<SignedTransaction> creditCardExpire = bookYourStay.startFlow(new BookingInitiatorFlow
-                ("Sonal", 17, checkInDate, checkOutDate, "NK", 100,
+                (id, "Sonal", 17, checkInDate, checkOutDate, "NK", 100,
                         "12345678901234", creditCardExpDateNew , 85, HotelHeaven));
         network.runNetwork();
         exception.expectCause(instanceOf(TransactionVerificationException.class));
@@ -126,7 +122,7 @@ public class FlowTests {
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
 
         // The IOUContract specifies that IOUs cannot have negative values.
-        BookingInitiatorFlow flow = new BookingInitiatorFlow("Sonal", 17, checkInDate, checkOutDate, "NK", 100,
+        BookingInitiatorFlow flow = new BookingInitiatorFlow(id, "Sonal", 17, checkInDate, checkOutDate, "NK", 100,
                 "12345678901234", creditCardExpDate , 85, HotelHeaven);
         CordaFuture<SignedTransaction> future = bookYourStay.startFlow(flow);
         network.runNetwork();
@@ -144,7 +140,7 @@ public class FlowTests {
         Date checkOutDate=new SimpleDateFormat("dd/MM/yyyy").parse(checkOut);
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
 
-        BookingInitiatorFlow flow = new BookingInitiatorFlow("Sonal", 27, checkInDate, checkOutDate, "NK", 100,
+        BookingInitiatorFlow flow = new BookingInitiatorFlow(id, "Sonal", 27, checkInDate, checkOutDate, "NK", 100,
                 "12345678901234", creditCardExpDate , 85, HotelHeaven);
         CordaFuture<SignedTransaction> future = bookYourStay.startFlow(flow);
         network.runNetwork();
@@ -160,7 +156,7 @@ public class FlowTests {
         Date checkInDate=new SimpleDateFormat("dd/MM/yyyy").parse(checkIn);
         Date checkOutDate=new SimpleDateFormat("dd/MM/yyyy").parse(checkOut);
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
-        BookingInitiatorFlow flow = new BookingInitiatorFlow("Sonal", 27, checkInDate, checkOutDate, "NK", 100,
+        BookingInitiatorFlow flow = new BookingInitiatorFlow(id, "Sonal", 27, checkInDate, checkOutDate, "NK", 100,
                 "12345678901234", creditCardExpDate , 85, HotelHeaven);
         CordaFuture<SignedTransaction> future = bookYourStay.startFlow(flow);
         network.runNetwork();
@@ -177,7 +173,7 @@ public class FlowTests {
         Date checkOutDate=new SimpleDateFormat("dd/MM/yyyy").parse(checkOut);
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
 
-        BookingInitiatorFlow flow = new BookingInitiatorFlow("Sonal", 27, checkInDate, checkOutDate, "NK", 100,
+        BookingInitiatorFlow flow = new BookingInitiatorFlow(id, "Sonal", 27, checkInDate, checkOutDate, "NK", 100,
                 "12345678901234", creditCardExpDate , 85, HotelHeaven);
         CordaFuture<SignedTransaction> future = bookYourStay.startFlow(flow);
         network.runNetwork();
@@ -198,7 +194,7 @@ public class FlowTests {
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
         int  custAge = 27;
 
-        BookingInitiatorFlow flow = new BookingInitiatorFlow("Sonal", 27, checkInDate, checkOutDate, "NK", 100,
+        BookingInitiatorFlow flow = new BookingInitiatorFlow(id, "Sonal", 27, checkInDate, checkOutDate, "NK", 100,
                 "12345678901234", creditCardExpDate , 85, HotelHeaven);
         CordaFuture<SignedTransaction> future = bookYourStay.startFlow(flow);
         network.runNetwork();
@@ -227,7 +223,7 @@ public class FlowTests {
         Date creditCardExpDate=new SimpleDateFormat("dd/MM/yyyy").parse(creditCardExp);
 
         int custAge = 27;
-        BookingInitiatorFlow flow = new BookingInitiatorFlow("Sonal", 27, checkInDate, checkOutDate, "NK", 100,
+        BookingInitiatorFlow flow = new BookingInitiatorFlow(id, "Sonal", 27, checkInDate, checkOutDate, "NK", 100,
                 "12345678901234", creditCardExpDate , 85, HotelHeaven);
         CordaFuture<SignedTransaction> future = bookYourStay.startFlow(flow);
         network.runNetwork();
